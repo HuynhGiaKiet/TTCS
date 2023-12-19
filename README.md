@@ -1,6 +1,8 @@
 #include <iostream>
 #include <graphics.h>
 #include <conio.h>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 struct node {
@@ -11,6 +13,8 @@ struct node {
 
 typedef struct node NODE;
 typedef NODE* Tree;
+
+
 void CreateCay(Tree &t)
 {
 	t = NULL; //cay rong
@@ -58,12 +62,12 @@ void drawBST(Tree root, int x, int y, int xSpacing) {
     drawNode(x, y, root->data);
 
     if (root->Pleft != NULL) {
-        drawLine(x, y + 20, x - xSpacing, y + 50);
+        drawLine(x, y + 20, x - xSpacing, y + 30);
         drawBST(root->Pleft, x - xSpacing, y + 50, xSpacing / 2);
     }
 
     if (root->Pright != NULL) {
-        drawLine(x, y + 20, x + xSpacing, y + 50);
+        drawLine(x, y + 20, x + xSpacing, y + 30);
         drawBST(root->Pright, x + xSpacing, y + 50, xSpacing / 2);
     }
 }
@@ -176,6 +180,25 @@ void XoaNodeVaVe(Tree &t, int x, int initialx, int y = 50, int xSpacing = 200) {
   cleardevice();
 }
 
+
+//Ham Nhap file
+void NhapTuFile(Tree &t, const char *INPUT) 
+{
+    ifstream file(INPUT);
+
+    if (!file.is_open()) 
+	{
+        cout << "Khong mo duoc file!" << endl;
+        return;
+    }
+    int x;
+    while (file >> x) 
+	{	
+        ThemNode(t, x);
+    }
+    file.close();
+}
+
 void Menu(Tree &t) {
     NODE* X = NULL;
     int choice, x;
@@ -187,7 +210,8 @@ void Menu(Tree &t) {
         cout << "\n3. Tim phan tu MAX co trong cay";
         cout << "\n4. Xoa node bat ky co trong cay";
         cout << "\n5. Xuat du lieu cay";
-        cout << "\n6. Ket thuc";
+        cout << "\n6. Xuat du lieu cay co trong file text";
+        cout << "\n7. Ket thuc";
         cout << "\n\n\t\t ========== END ===========";
         cout << "\nNhap lua chon cua ban: ";
         cin >> choice;
@@ -225,7 +249,14 @@ void Menu(Tree &t) {
                 Duyet_RNL(t);
                 system("pause");
                 break;
-            case 6:
+        	case 6:
+        		NhapTuFile(t, "INPUT.txt");
+        		//ThemNodeVaVe(t, x, getmaxx() / 2);
+                drawBST(t, getmaxx() / 2, 50, 200);
+                //Duyet_RNL(t);
+                system("pause");
+                break;
+            case 7:
                 cout << "\nThoat chuong trinh.";
                 break;
             default:
@@ -233,14 +264,18 @@ void Menu(Tree &t) {
                 break;
         }
 
-    } while (choice != 6);
+    } while (choice != 7);
 }
 
 int main() {
-    int gd = DETECT, gm;
-    initgraph(&gd, &gm, "C:\\Turboc3\\BGI");
+    int gd = DETECT, gm ;
+     // Cung c?p du?ng d?n d?n trình di?u khi?n d? h?a
+
+      //G?i hàm initgraph() v?i du?ng d?n du?c ch? d?nh b?i bi?n pathtodriver
+  	initgraph(&gd, &gm, "");
     Tree t;
     CreateCay(t);
+    //NhapTuFile(t, "INPUT.txt");
     Menu(t);
     drawBST(t, getmaxx() / 2, 50, 200);
     system("pause");
