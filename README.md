@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <fstream>
 #include <sstream>
+
 using namespace std;
 
 struct node {
@@ -33,7 +34,7 @@ void ThemNode(Tree &t, int x)
 	else //Cay co ton tai phan tu
 	{
 		//Neu phan tu them vao ma nho hon node goc => them vao ben trai
-		if(t->data > x)
+		if(t->data >= x)
 		{
 			ThemNode(t->Pleft,x);// duyet qua trai de them phan tu x
 		}
@@ -62,13 +63,13 @@ void drawBST(Tree root, int x, int y, int xSpacing) {
     drawNode(x, y, root->data);
 
     if (root->Pleft != NULL) {
-        drawLine(x, y + 20, x - xSpacing, y + 30);
-        drawBST(root->Pleft, x - xSpacing, y + 50, xSpacing / 2);
+        drawLine(x, y + 20, x - xSpacing , y + 30);
+        drawBST(root->Pleft, x - xSpacing , y + 50, xSpacing / 2);
     }
 
     if (root->Pright != NULL) {
         drawLine(x, y + 20, x + xSpacing, y + 30);
-        drawBST(root->Pright, x + xSpacing, y + 50, xSpacing / 2);
+        drawBST(root->Pright, x + xSpacing , y + 50, xSpacing / 2);
     }
 }
 
@@ -149,7 +150,17 @@ NODE* XoaNode(Tree &t, int del)
         }
     }
 }
+void XoaTatCaNode(Tree &t) {
+    if (t == NULL) {
+        return;
+    }
 
+    XoaTatCaNode(t->Pleft);
+    XoaTatCaNode(t->Pright);
+
+    delete t;
+    t = NULL;
+}	
 void Duyet_RNL(Tree t) {
     if (t != NULL) {
         Duyet_RNL(t->Pright);
@@ -178,40 +189,50 @@ void XoaNodeVaVe(Tree &t, int x, int initialx, int y = 50, int xSpacing = 200) {
   XoaNode(t, x);
   Duyet_GTS(t, initialx, y, xSpacing);
   cleardevice();
+  drawBST(t, getmaxx() / 2, 50, 200);
 }
 
 
 //Ham Nhap file
-void NhapTuFile(Tree &t, const char *INPUT) 
-{
-    ifstream file(INPUT);
+void NhapTuFile(Tree &t) {
+    char fileName[50];
 
-    if (!file.is_open()) 
-	{
+    cout << "Nhap ten file text: ";
+    cin >> fileName;
+
+    ifstream file(fileName);
+
+    if (!file.is_open()) {
         cout << "Khong mo duoc file!" << endl;
         return;
     }
+
     int x;
-    while (file >> x) 
-	{	
+    while (file >> x) {
         ThemNode(t, x);
     }
+
     file.close();
+    cout << "Da nhap du lieu tu file thanh cong!" << endl;
+    drawBST(t, getmaxx() / 2, 50, 200);
+    system("pause");
 }
 
 void Menu(Tree &t) {
     NODE* X = NULL;
     int choice, x;
-
+	
     do {
+    	system("cls");
         cout << "\n\n\t\t ========== MENU ==========";
         cout << "\n1. Them du lieu cay";
         cout << "\n2. Tim kiem phan tu co trong cay";
         cout << "\n3. Tim phan tu MAX co trong cay";
         cout << "\n4. Xoa node bat ky co trong cay";
         cout << "\n5. Xuat du lieu cay";
-        cout << "\n6. Xuat du lieu cay co trong file text";
-        cout << "\n7. Ket thuc";
+        cout << "\n6. Nhap du lieu co san trong file text";
+        cout << "\n7. Reset tat ca cac node trong cay";
+        cout << "\n8. Ket thuc";
         cout << "\n\n\t\t ========== END ===========";
         cout << "\nNhap lua chon cua ban: ";
         cin >> choice;
@@ -222,14 +243,16 @@ void Menu(Tree &t) {
                 cin >> x;
                 ThemNodeVaVe(t, x, getmaxx() / 2);
                 drawBST(t, getmaxx() / 2, 50, 200);
+                cout << "Phan tu " << x << " da duoc them vao cay BST!";
+                system("pause");
                 break;
             case 2:
                 cout << "Nhap phan tu can tim kiem: ";
                 cin >> x;
                 if (TimKiem(t, x) == NULL) {
-                    cout << "\nPhan tu " << x << " khong ton tai trong cay BST!";
+                    cout << "Phan tu " << x << " khong ton tai trong cay BST!";
                 } else {
-                    cout << "\nPhan tu " << x << " co ton tai trong cay BST!";
+                    cout << "Phan tu " << x << " co ton tai trong cay BST!";
                 }
                 system("pause");
                 break;
@@ -240,9 +263,15 @@ void Menu(Tree &t) {
             case 4:
                 cout << "Nhap gia tri can xoa: ";
                 cin >> x;
-                X = XoaNode(t, x);
-                XoaNodeVaVe(t, x, getmaxx() / 2);
-                drawBST(t, getmaxx() / 2, 50, 200);
+                if (TimKiem(t, x) == NULL) {
+                    cout << "Phan tu " << x << " khong ton tai trong cay BST!";
+                } else {
+                    cout << "Phan tu " << x << " da xoa trong cay BST!";
+                    X = XoaNode(t, x);
+                	XoaNodeVaVe(t, x, getmaxx() / 2);
+                	drawBST(t, getmaxx() / 2, 50, 200);
+                }
+				system("pause");
                 break;
             case 5:
                 cout << "\n\t\tDuyet cay BST hien tai: ";
@@ -250,13 +279,20 @@ void Menu(Tree &t) {
                 system("pause");
                 break;
         	case 6:
-        		NhapTuFile(t, "INPUT.txt");
+        		NhapTuFile(t);
+        		//NhapTuFile(t, "INPUT.txt");
         		//ThemNodeVaVe(t, x, getmaxx() / 2);
                 drawBST(t, getmaxx() / 2, 50, 200);
                 //Duyet_RNL(t);
-                system("pause");
+                //system("pause");
                 break;
-            case 7:
+			case 7:
+    			XoaTatCaNode(t);
+    			cleardevice();
+    			cout << "\nTat ca cac node da duoc xoa!";
+    			system("pause");
+    			break;
+    	 	case 8:
                 cout << "\nThoat chuong trinh.";
                 break;
             default:
@@ -264,15 +300,15 @@ void Menu(Tree &t) {
                 break;
         }
 
-    } while (choice != 7);
+    } while (choice != 8);
 }
 
 int main() {
     int gd = DETECT, gm ;
      // Cung c?p du?ng d?n d?n trình di?u khi?n d? h?a
-
+	 initwindow(1920, 1080);
       //G?i hàm initgraph() v?i du?ng d?n du?c ch? d?nh b?i bi?n pathtodriver
-  	initgraph(&gd, &gm, "");
+  	//initgraph(&gd, &gm, "");
     Tree t;
     CreateCay(t);
     //NhapTuFile(t, "INPUT.txt");
