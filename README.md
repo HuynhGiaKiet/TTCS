@@ -218,6 +218,35 @@ void NhapTuFile(Tree &t) {
     system("pause");
 }
 
+
+//Ham Luu dulieu cay
+void LuuDuLieuCay(Tree t, ofstream &outputFile) {
+    if (t != NULL) {
+        LuuDuLieuCay(t->Pright, outputFile);
+        outputFile << t->data << " ";
+        LuuDuLieuCay(t->Pleft, outputFile);
+    }
+}
+//Ham luu du lieu cay vao file
+void LuuDuLieuFile(Tree t) {
+    char tenFile[50];
+    cout << "Nhap ten file de luu du lieu: ";
+    cin >> tenFile;
+
+    ofstream outputFile(tenFile);
+
+    if (!outputFile.is_open()) {
+        cout << "Khong mo duoc file de ghi!" << endl;
+        return;
+    }
+
+    LuuDuLieuCay(t, outputFile);
+
+    outputFile.close();
+
+    cout << "Du lieu cua cay da duoc luu vao file " << tenFile << endl;
+}
+
 void Menu(Tree &t) {
     NODE* X = NULL;
     int choice, x;
@@ -229,15 +258,17 @@ void Menu(Tree &t) {
         cout << "\n2. Tim kiem phan tu co trong cay";
         cout << "\n3. Tim phan tu MAX co trong cay";
         cout << "\n4. Xoa node bat ky co trong cay";
-        cout << "\n5. Xuat du lieu cay";
+        cout << "\n5. Duyet cay (R-N-L)";
         cout << "\n6. Nhap du lieu co san trong file text";
-        cout << "\n7. Reset tat ca cac node trong cay";
-        cout << "\n8. Ket thuc";
+        cout << "\n7. Luu du lieu cay vao file text";
+        cout << "\n8. Reset tat ca cac node trong cay";
+        cout << "\n9. Ket thuc";
         cout << "\n\n\t\t ========== END ===========";
         cout << "\nNhap lua chon cua ban: ";
         cin >> choice;
 
         switch (choice) {
+        	//system("cls");
             case 1:
                 cout << "Nhap phan tu can them vao cay BST: ";
                 cin >> x;
@@ -286,28 +317,31 @@ void Menu(Tree &t) {
                 //Duyet_RNL(t);
                 //system("pause");
                 break;
-			case 7:
+            case 7:
+                LuuDuLieuFile(t);
+                system("pause");
+                break;
+			case 8:
     			XoaTatCaNode(t);
     			cleardevice();
     			cout << "\nTat ca cac node da duoc xoa!";
     			system("pause");
     			break;
-    	 	case 8:
+    	 	case 9:
                 cout << "\nThoat chuong trinh.";
                 break;
             default:
-                cout << "Lua chon khong hop le. Vui long nhap";
+                cout << "Lua chon khong hop le. Vui long nhap lai";
+                system("pause");
                 break;
         }
 
-    } while (choice != 8);
+    } while (choice != 9);
 }
 
 int main() {
     int gd = DETECT, gm ;
-     // Cung c?p du?ng d?n d?n trình di?u khi?n d? h?a
 	 initwindow(1920, 1080);
-      //G?i hàm initgraph() v?i du?ng d?n du?c ch? d?nh b?i bi?n pathtodriver
   	//initgraph(&gd, &gm, "");
     Tree t;
     CreateCay(t);
